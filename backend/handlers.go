@@ -13,10 +13,12 @@ func getTarefas(w http.ResponseWriter, r *http.Request) {
 func postTarefas(w http.ResponseWriter, r *http.Request) {
 	var novaTarefa Tarefa
 	json.NewDecoder(r.Body).Decode(&novaTarefa)
+
 	if novaTarefa.Titulo == "" {
 		http.Error(w, "Dados Invalido", http.StatusBadRequest)
 		return
 	}
+
 	switch novaTarefa.Status {
 	case "":
 		novaTarefa.Status = "a_fazer"
@@ -26,6 +28,13 @@ func postTarefas(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	novaTarefa.ID = proximoID + 1
+	novaTarefa.ID = proximoID
+	proximoID = proximoID + 1
+
+	tarefas = append(tarefas, novaTarefa)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(novaTarefa)
 
 }

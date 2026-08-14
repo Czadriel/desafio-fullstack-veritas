@@ -6,7 +6,10 @@ import (
 
 func main() {
 
-	http.HandleFunc("/tasks", getTarefas)
-	http.ListenAndServe(":8080", nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /tasks", getTarefas)
+	mux.HandleFunc("POST /tasks", postTarefas)
+
+	http.ListenAndServe(":8080", mux)
 
 }
