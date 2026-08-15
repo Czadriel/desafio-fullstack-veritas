@@ -31,6 +31,17 @@ function App() {
     setTarefas(tarefas.filter(tarefa => tarefa.id !== id));
   }
 
+  async function moverTarefa(tarefa, novoStatus) {
+    await fetch(`http://localhost:8080/tasks/${tarefa.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+         titulo: tarefa.titulo, descricao: tarefa.descricao, status: novoStatus })
+    });
+    setTarefas(tarefas.map(t => t.id === tarefa.id ? {... t, status : novoStatus} : t));
+  }
+
+
   return (
     <div>
       <h1>Mini Kanban</h1>
@@ -54,6 +65,7 @@ function App() {
         {tarefas.filter(tarefa => tarefa.status === "a_fazer").map(tarefa => (
           <div key={tarefa.id}>
             {tarefa.titulo}
+            <button onClick={() => moverTarefa(tarefa, "em_progresso")}>Mover</button>
             <button onClick={() => excluirTarefa(tarefa.id)}>Excluir</button>
           </div>
         ))}
@@ -64,6 +76,7 @@ function App() {
         {tarefas.filter(tarefa => tarefa.status === "em_progresso").map(tarefa => (
           <div key={tarefa.id}>
             {tarefa.titulo}
+            <button onClick={() => moverTarefa(tarefa, "concluido")}>Mover</button>
             <button onClick={() => excluirTarefa(tarefa.id)}>Excluir</button>
           </div>
         ))}
@@ -78,6 +91,7 @@ function App() {
           </div>
         ))}
       </div>
+
 
     </div>
   );
