@@ -65,3 +65,50 @@ func deleteTarefas(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func putTarefas(w http.ResponseWriter, r *http.Request) {
+	idTexto := r.PathValue("id")
+	id, err := strconv.Atoi(idTexto)
+	if err != nil {
+		http.Error(w, "Id inválido", http.StatusBadRequest)
+		return
+	}
+
+	var dadosAtualizados Tarefa
+	json.NewDecoder(r.Body).Decode(&dadosAtualizados)
+
+	switch dadosAtualizados.Status {
+	case "a_fazer", "em_progresso", "concluido":
+	default:
+		http.Error(w, "Status Inválido", http.StatusBadRequest)
+		return
+	}
+
+	encontrado := false
+	indiceEncontrado := -1
+	for indice, tarefa := range tarefas {
+		if tarefa.ID == id {
+
+			if dadosAtualizados.Titulo == "" {
+				http.Error(w, "Título obrigatório", http.StatusBadRequest)
+				return
+			}
+
+			indiceEncontrado = indice
+			tarefas[indice].Titulo = dadosAtualizados.Titulo
+			tarefas[indice].Status = dadosAtualizados.Status
+			tarefas[indice].Descricao = dadosAtualizados.Descricao
+
+			encontrado = true
+			break
+
+		}
+	}
+	if !encontrado {
+		http.Error(w, "tarefa não encontrado", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(tarefas[indiceEncontrado])
+}
