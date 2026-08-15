@@ -12,6 +12,6 @@ func main() {
 	mux.HandleFunc("PUT /tasks/{id}", putTarefas)
 	mux.HandleFunc("DELETE /tasks/{id}", deleteTarefas)
 
-	http.ListenAndServe(":8080", mux)
+	http.ListenAndServe(":8080", corsMiddleware(mux))
 
 }
